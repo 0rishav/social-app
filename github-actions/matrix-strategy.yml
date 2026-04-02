@@ -1,4 +1,4 @@
-name: Artifacts Example
+name: Matrix Strategy
 
 on:
   push:
