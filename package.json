@@ -1,0 +1,25 @@
+{
+  "name": "xynapse-mono-repo",
+  "version": "1.0.0",
+  "description": "Xynapse Platform Monorepo",
+  "private": true,
+  "main": "index.js",
+  "type": "module",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "identity": "npm run dev --workspace=identity-service",
+    "post": "npm run dev --workspace=post-service",
+    "engagement": "npm run dev --workspace=engagement-service",
+    "media": "npm run dev --workspace=media-service",
+    "install:all": "npm install"
+  },
+  "keywords": [
+    "microservices",
+    "monorepo"
+  ],
+  "author": "Rishabh",
+  "license": "ISC"
+}

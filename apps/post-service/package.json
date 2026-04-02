@@ -1,0 +1,36 @@
+{
+  "name": "post-service",
+  "version": "1.0.0",
+  "description": "Post Service with Kafka Events and Redis Caching",
+  "type": "module",
+  "main": "src/server.js",
+  "scripts": {
+    "dev": "nodemon src/index.js",
+    "start": "node src/index.js",
+    "test": "jest",
+    "seed:1m": "node src/scripts/seed-posts.js"
+  },
+  "dependencies": {
+    "bson": "^7.2.0",
+    "cors": "^2.8.6",
+    "dotenv": "^16.6.1",
+    "express": "^4.18.2",
+    "helmet": "^7.1.0",
+    "ioredis": "^5.3.2",
+    "joi": "^17.11.0",
+    "kafkajs": "^2.2.4",
+    "mongoose": "^8.2.0",
+    "morgan": "^1.10.1",
+    "node-cron": "^4.2.1",
+    "pino": "^8.19.0",
+    "pino-pretty": "^10.3.1",
+    "redis": "^5.11.0",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.1"
+  },
+  "devDependencies": {
+    "faker": "^6.6.6",
+    "jest": "^29.7.0",
+    "nodemon": "^3.1.0"
+  }
+}
