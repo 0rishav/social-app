@@ -1,0 +1,26 @@
+# name: Nodejs-Basic-CI          # Workflow ka naam
+# on:                            # Problem 2: Trigger on push to main
+#   push:
+#     branches: [ "feat/auth" ]
+
+# jobs:
+#   build-and-test:              # Job ka naam
+#     runs-on: ubuntu-latest     # GitHub ka cloud VM (Runner)
+
+#     steps:
+#       - name: Checkout Code    # GitHub se tera code Runner pe lana
+#         uses: actions/checkout@v4
+
+#       - name: Setup Node.js    # Node install karna Runner pe
+#         uses: actions/setup-node@v4
+#         with:
+#           node-version: '18'
+
+#       - name: Say Hello        # Problem 3: Echo "Hello CI/CD"
+#         run: echo "Hello CI/CD - Rishav's first automation!"
+
+#       - name: Install Dependencies # Problem 1: npm install
+#         run: npm install
+
+#       - name: Run Tests           # Problem 1: npm test
+#         run: npm test
