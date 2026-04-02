@@ -1,0 +1,40 @@
+name: Deploy-to-GitHub-Pages
+
+on:
+  push:
+    branches: [ "feat/auth" ] # Real life mein ye 'main' pe hota hai
+
+# 1. Permissions (Bahut zaroori hai, warna deployment fail hogi)
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Pages
+        # Ye internal configuration set kar deta hai
+        uses: actions/configure-pages@v4
+
+      - name: Build My Site
+        # Yahan tera asli 'npm run build' aayega
+        # Abhi ke liye hum wahi dummy 'dist' folder banate hain
+        run: |
+          mkdir dist
+          echo "<h1>Welcome to Rishav's Social App</h1>" > dist/index.html
+          echo "<p>Deployed via GitHub Actions!</p>" >> dist/index.html
+
+      - name: Upload Artifact for Pages
+        # Pages ko ek khas tarah ka artifact chahiye hota hai
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist/
+
+      - name: Deploy to GitHub Pages
+        # Ye aakhri step hai jo site live karega
+        uses: actions/deploy-pages@v4
