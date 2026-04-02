@@ -4,7 +4,7 @@ on:
   push:
     branches: [ "feat/auth" ] # Real life mein ye 'main' pe hota hai
 
-# 1. Permissions (Bahut zaroori hai, warna deployment fail hogi)
+# 1. Permissions 
 permissions:
   contents: read
   pages: write
