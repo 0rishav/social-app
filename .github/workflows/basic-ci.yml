@@ -1,7 +1,7 @@
 name: Nodejs-Basic-CI          # Workflow ka naam
 on:                            # Problem 2: Trigger on push to main
   push:
-    branches: [ "main" ]
+    branches: [ "feat/auth" ]
 
 jobs:
   build-and-test:              # Job ka naam
