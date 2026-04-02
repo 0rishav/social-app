@@ -1,4 +1,4 @@
-name: Multi-Level-Env-Test
+name: Artifacts Example
 
 on:
   push:
