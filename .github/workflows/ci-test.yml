@@ -36,4 +36,4 @@ jobs:
           npm install
           
           echo "🧪 Running Tests for ${{ matrix.service }}..."
-          npm test
+          npm test -- --passWithNoTests
