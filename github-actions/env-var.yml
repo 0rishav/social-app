@@ -1,0 +1,44 @@
+# name: Multi-Level-Env-Test
+
+# on:
+#   push:
+#     branches: [ "feat/auth" ]
+
+# # --- LEVEL 1: WORKFLOW LEVEL ---
+# # Ye variables poore file mein kahin bhi use ho sakte hain
+# env:
+#   NODE_ENV: "development"
+#   FRONTEND_URL: "http://localhost:5173"
+
+# jobs:
+#   test-env-logic:
+#     runs-on: ubuntu-latest
+    
+#     # --- LEVEL 2: JOB LEVEL ---
+#     # Ye sirf isi 'test-env-logic' job ke andar dikhenge
+#     env:
+#       JOB_SCOPE: "Job Level Variable"
+
+#     steps:
+#       - name: Checkout Code
+#         uses: actions/checkout@v4
+
+#       - name: Step 1 - Access Workflow and Job Envs
+#         run: |
+#           echo "Accessing Workflow Level NODE_ENV: $NODE_ENV"
+#           echo "Accessing Workflow Level FRONTEND_URL: $FRONTEND_URL"
+#           echo "Accessing Job Level Var: $JOB_SCOPE"
+
+#       - name: Step 2 - Access Step Level Env
+#         # --- LEVEL 3: STEP LEVEL ---
+#         # Ye sirf isi step ke liye zinda rahega
+#         env:
+#           STEP_ONLY_VAR: "I am invisible to others"
+#         run: |
+#           echo "Step level var: $STEP_ONLY_VAR"
+#           echo "Workflow level still works: $NODE_ENV"
+
+#       - name: Step 3 - Prove Step Isolation
+#         run: |
+#           echo "Trying to access Step 2 var: '$STEP_ONLY_VAR'"
+#           echo "Notice: Upar wali line khaali aayegi (empty), kyunki step vars scope ke bahar hain."

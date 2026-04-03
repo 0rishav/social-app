@@ -1,0 +1,40 @@
+# name: Deploy-to-GitHub-Pages
+
+# on:
+#   pull_request:
+#     branches: [ "main" ] # Real life mein ye 'main' pe hota hai
+
+# # 1. Permissions 
+# permissions:
+#   contents: read
+#   pages: write
+#   id-token: write
+
+# jobs:
+#   build-and-deploy:
+#     runs-on: ubuntu-latest
+#     steps:
+#       - name: Checkout Code
+#         uses: actions/checkout@v4
+
+#       - name: Setup Pages
+#         # Ye internal configuration set kar deta hai
+#         uses: actions/configure-pages@v4
+
+#       - name: Build My Site
+#         # Yahan tera asli 'npm run build' aayega
+#         # Abhi ke liye hum wahi dummy 'dist' folder banate hain
+#         working-directory: ./frontend
+#         run: |
+#           npm ci
+#           npm run build
+
+#       - name: Upload Artifact for Pages
+#         # Pages ko ek khas tarah ka artifact chahiye hota hai
+#         uses: actions/upload-pages-artifact@v3
+#         with:
+#           path: frontend/dist/
+
+#       - name: Deploy to GitHub Pages
+#         # Ye aakhri step hai jo site live karega
+#         uses: actions/deploy-pages@v4

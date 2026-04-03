@@ -1,0 +1,35 @@
+# name: Matrix-Strategy-Multi-OS
+
+# on:
+#   push:
+#     branches: [ "feat/auth" ]
+
+# jobs:
+#   test-node-versions:
+#     # 1. Yahan matrix se OS uthao
+#     runs-on: ${{ matrix.os }}
+
+#     strategy:
+#       matrix:
+#         os: [ubuntu-latest, windows-latest]
+#         node: [18, 20] # Node 14/16 ab purane ho gaye hain, 18/20 use karna better hai
+
+#     steps:
+#       - name: Checkout Code
+#         uses: actions/checkout@v4
+
+#       - name: Setup Node.js
+#         uses: actions/setup-node@v4
+#         with:
+#           # 2. Key ka naam 'node-version' hi hona chahiye
+#           node-version: ${{ matrix.node }}
+
+#       - name: Run Tests
+#         # 3. 'bash' specify karne se ye Windows aur Ubuntu dono pe same chalega
+#         shell: bash
+#         run: |
+#           echo "Current OS: ${{ matrix.os }}"
+#           echo "Node version: $(node -v)"
+#           npm install
+#           # Agar monorepo hai toh 'npm test' root se chal jayega
+#           npm test

@@ -1,0 +1,28 @@
+# name: Artifacts Example
+
+# on:
+#   push:
+#     branches: [ "feat/auth" ]
+
+
+# jobs:
+#   handle-artifacts:
+#     runs-on: ubuntu-latest
+#     steps:
+#       - name: Checkout Code
+#         uses: actions/checkout@v4
+
+#       - name: Generate Build Simulation
+#         # Yahan hum ek fake 'dist' folder bana rahe hain multi-line command se
+#         run: |
+#           mkdir dist
+#           echo "Main index file hoon" > dist/index.html
+#           echo "Main style file hoon" > dist/style.css
+#           echo "Build successful at $(date)" > dist/log.txt
+
+#       - name: Upload My Build Folder
+#         uses: actions/upload-artifact@v4
+#         with:
+#           name: website-build-files   # Is naam se zip milegi
+#           path: dist/                 # Is folder ko uthao
+#           retention-days: 5           # (Optional) 5 din baad delete kar dena space bachane ke liye

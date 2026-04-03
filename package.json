@@ -10,6 +10,7 @@
     "packages/*"
   ],
   "scripts": {
+    "test": "echo \"Success: No tests yet!\" && exit 0",
     "identity": "npm run dev --workspace=identity-service",
     "post": "npm run dev --workspace=post-service",
     "engagement": "npm run dev --workspace=engagement-service",
@@ -21,5 +22,8 @@
     "monorepo"
   ],
   "author": "Rishabh",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^1.14.0"
+  }
 }

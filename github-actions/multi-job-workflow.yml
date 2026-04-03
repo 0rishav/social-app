@@ -1,0 +1,42 @@
+# name: Multi-Job CI-CD
+
+# on:
+#   push:
+#     branches: [ "main" ]
+
+# jobs:
+#   # JOB 1: Code ko Build karna
+#   build:
+#     runs-on: ubuntu-latest
+#     steps:
+#       - uses: actions/checkout@v4
+#       - name: Install & Build
+#         run: |
+#           npm install
+#           npm run build
+#       - name: Upload Build Artifact # Build folder ko "Save" karna taaki doosre jobs use kar sakein
+#         uses: actions/upload-artifact@v4
+#         with:
+#           name: production-files
+#           path: ./dist
+
+#   # JOB 2: Testing (Ye tabhi chalega jab Build success hoga)
+#   test:
+#     needs: build # <--- ZAROORI: Build success hone par hi ye shuru hoga
+#     runs-on: ubuntu-latest
+#     steps:
+#       - uses: actions/checkout@v4
+#       - name: Run Unit Tests
+#         run: npm test
+
+#   # JOB 3: Deployment (Ye tabhi chalega jab Test aur Build dono pass honge)
+#   deploy:
+#     needs: [build, test] # <--- Dono pe dependency
+#     runs-on: ubuntu-latest
+#     steps:
+#       - name: Download Build Artifact
+#         uses: actions/download-artifact@v4
+#         with:
+#           name: production-files
+#       - name: Deploy to Server (e.g., ArgoCD/S3)
+#         run: echo "Deploying to Production..."
