@@ -16,7 +16,7 @@ const App = () => {
         <Header />
 
         <main>
-          <Routes>
+          <Routes basename="/social-app">
             {/* Landing Page Route */}
             <Route path="/" element={<Landing />} />
             <Route path="/services" element={<Services />} />
