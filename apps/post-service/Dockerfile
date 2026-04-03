@@ -14,7 +14,7 @@ COPY packages/common/package*.json ./packages/common/
 
 
 # 4. Dependencies install karo (Root se taaki link ho jayein)
-RUN npm install --production
+RUN npm install 
 
 # 5. Ab asli code copy karo (Post service + Shared logic)
 COPY apps/post-service ./apps/post-service

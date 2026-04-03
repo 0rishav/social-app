@@ -1,0 +1,32 @@
+# Dependencies
+node_modules
+**/node_modules
+
+# Debug/Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+logs
+*.log
+
+# Build outputs
+dist
+build
+.next
+.nuxt
+
+# Docker & Git files
+.git
+.gitignore
+.dockerignore
+Dockerfile
+.github
+
+# Environment variables (SECURITY!)
+.env
+.env.local
+.env.*.local
+
+# OS files
+.DS_Store
+thumbs.db
