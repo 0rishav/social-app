@@ -1,20 +1,18 @@
-FROM node:18-alpine
-
-RUN apk add --no-cache python3 make g++
-
+# Stage 1: Build/Install
+FROM node:18-alpine AS builder
 WORKDIR /app
 
 COPY package*.json ./
+COPY apps/identity-service/package*.json ./apps/identity-service/
+COPY packages/ ./packages/ 
 
-COPY packages ./packages
-COPY apps ./apps
+RUN npm install --frozen-lockfile
 
-RUN npm install
+FROM node:18-alpine
+WORKDIR /app
+COPY --from=builder /app/node_modules ./node_modules
+COPY . .
 
 WORKDIR /app/apps/identity-service
-
 EXPOSE 8001
-
-ENV NODE_ENV=production
-
-CMD ["node", "src/index.js"]
+CMD ["npm", "start"]
