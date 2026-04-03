@@ -15,21 +15,13 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      # --- YAHAN SE CACHING SHURU ---
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: 'npm' # Ye line jadu hai, ye automatically package-lock ko track karti hai
+      # 1. Ye step Docker ko "Superpowers" deta hai (Multi-platform support)
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
 
-      - name: Cache Docker layers
-        uses: actions/cache@v4
-        with:
-          path: /tmp/.buildx-cache
-          key: ${{ runner.os }}-buildx-${{ github.sha }}
-          restore-keys: |
-            ${{ runner.os }}-buildx-
-      # --- CACHING KHATAM ---
+      # 2. Ye step naya Builder banata hai jo Caching support karta hai (ZAROORI HAI)
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
 
       - name: Login to Docker Hub
         uses: docker/login-action@v3
@@ -44,9 +36,6 @@ jobs:
           file: ./apps/${{ matrix.service }}/Dockerfile
           push: true
           tags: ${{ secrets.DOCKER_USERNAME }}/${{ matrix.service }}:v5
-          cache-from: type=local,src=/tmp/.buildx-cache
-          cache-to: type=local,dest=/tmp/.buildx-cache-new,mode=max
-      - name: Move cache
-        run: |
-          rm -rf /tmp/.buildx-cache
-          mv /tmp/.buildx-cache-new /tmp/.buildx-cache
+          # --- GHA CACHING (Sabse Fast aur Clean) ---
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
