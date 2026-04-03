@@ -10,13 +10,13 @@ import Footer from "./components/Footer";
 import Studio from "./pages/studio/Studio";
 const App = () => {
   return (
-    <Router>
+    <Router basename="/social-app">
       <div className="bg-ivory min-h-screen selection:bg-gold selection:text-charcoal">
         {/* Header sabhi pages par dikhega */}
         <Header />
 
         <main>
-          <Routes basename="/social-app">
+          <Routes>
             {/* Landing Page Route */}
             <Route path="/" element={<Landing />} />
             <Route path="/services" element={<Services />} />
