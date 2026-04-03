@@ -1,7 +1,7 @@
 name: Build and Push Microservices
 
 on:
-  push:
+  pull_request:         # Ye line add kar do
     branches: [ "main" ] # Jab main mein merge ho tabhi push karega
 
 jobs:
