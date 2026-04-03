@@ -24,16 +24,16 @@ jobs:
       - name: Build My Site
         # Yahan tera asli 'npm run build' aayega
         # Abhi ke liye hum wahi dummy 'dist' folder banate hain
+        working-directory: ./frontend
         run: |
-          mkdir dist
-          echo "<h1>Welcome to Rishav's Social App</h1>" > dist/index.html
-          echo "<p>Deployed via GitHub Actions!</p>" >> dist/index.html
+          npm ci
+          npm run build
 
       - name: Upload Artifact for Pages
         # Pages ko ek khas tarah ka artifact chahiye hota hai
         uses: actions/upload-pages-artifact@v3
         with:
-          path: dist/
+          path: frontend/dist/
 
       - name: Deploy to GitHub Pages
         # Ye aakhri step hai jo site live karega
