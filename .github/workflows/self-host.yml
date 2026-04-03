@@ -22,6 +22,6 @@ jobs:
           echo "Memory Info:"
           free -h
 
-      - name: Docker Permission Test
-        run: |
-          docker ps # Ye check karne ke liye ki kya runner docker chala pa raha hai
+      # - name: Docker Permission Test
+      #   run: |
+      #     docker ps # Ye check karne ke liye ki kya runner docker chala pa raha hai
