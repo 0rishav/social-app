@@ -1,0 +1,31 @@
+name: Production Tag-Based Release
+
+on:
+  push:
+    tags:
+      - 'v*--*'
+
+jobs:
+  # Job 1: Pehle image build aur push hogi (Ye automatic chalega)
+  build-and-push:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      # ... tera purana docker build/push wala logic yahan rahega ...
+      - name: Build and Push
+        run: echo "Docker Image Pushed to Hub! 🚀"
+
+  # Job 2: Ye hai tera Manual Approval wala Job
+  deploy-to-prod:
+    runs-on: ubuntu-latest
+    needs: build-and-push   # Ye tabhi shuru hoga jab Build success ho
+    
+    # ASLI JADOO YAHAN HAI:
+    environment: production 
+    
+    steps:
+      - name: Final Deploy Command
+        run: |
+          echo "Deploying ${{ github.ref_name }} to Production Cluster..."
+          # Yahan tera kubectl apply ya real deployment command aayega

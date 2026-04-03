@@ -1,0 +1,27 @@
+name: GCP Self-Hosted Test
+
+on:
+  push:
+    branches: [ feat/auth ] 
+
+jobs:
+  verify-gcp-runner:
+    # YE SABSE IMPORTANT HAI: Wahi label use karo jo tune config mein diya tha
+    runs-on: [self-hosted,gcp-vm] 
+    
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: System Specs Check
+        run: |
+          echo "Bhai, main GCP ke server pe zinda hoon! 🔥"
+          echo "Current User: $(whoami)"
+          echo "Hostname: $(hostname)"
+          echo "CPU Info: $(nproc) cores"
+          echo "Memory Info:"
+          free -h
+
+      # - name: Docker Permission Test
+      #   run: |
+      #     docker ps # Ye check karne ke liye ki kya runner docker chala pa raha hai
