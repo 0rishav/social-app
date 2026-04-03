@@ -1,0 +1,39 @@
+name: CI - Pull Request Validation
+
+on:
+  push:
+    branches: [ main ]
+  pull_request: # Yeh zaroori hai!
+    branches: [ main ]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    strategy:
+      # Isse ek service fail hone par dusri rukegi nahi
+      fail-fast: false 
+      matrix:
+        service: [identity-service, post-service]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Cache Node Modules
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          # Matrix use kar rahe ho toh key mein service name dalna safe rehta hai
+          key: ${{ runner.os }}-node-${{ matrix.service }}-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-${{ matrix.service }}-
+
+      - name: Install & Test Service
+        run: |
+          # Pehle folder ke andar jao
+          cd apps/${{ matrix.service }}
+          
+          echo "🛠️ Installing for ${{ matrix.service }}..."
+          npm install
+          
+          echo "🧪 Running Tests for ${{ matrix.service }}..."
+          npm test
