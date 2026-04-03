@@ -25,6 +25,8 @@ import { startPostConsumer } from "./utils/postConsumer.js";
 const PORT = process.env.POST_PORT || 5001;
 const WORKER_COUNT = 14;
 
+console.log("Testing Cache")
+
 const kafka = new Kafka({
   clientId: "post-service",
   brokers: ["localhost:9092"],
