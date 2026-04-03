@@ -1,5 +1,5 @@
 # Stage 1: Build/Install
-FROM node:18-alpine
+FROM node:20-alpine
 WORKDIR /app
 
 # 3. Layer Caching: Pehle saari package.json files copy karo

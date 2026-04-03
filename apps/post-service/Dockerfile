@@ -1,5 +1,5 @@
 # 1. Base Image
-FROM node:18-alpine
+FROM node:20-alpine
 
 # 2. Monorepo ke liye Root Workdir
 WORKDIR /app
