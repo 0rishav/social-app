@@ -11,8 +11,7 @@ COPY package*.json ./
 COPY apps/post-service/package*.json ./apps/post-service/
 # Shared Packages package.json (Dependency chain)
 COPY packages/common/package*.json ./packages/common/
-COPY packages/protos/package*.json ./packages/protos/
-COPY packages/shared-models/package*.json ./packages/shared-models/
+
 
 # 4. Dependencies install karo (Root se taaki link ho jayein)
 RUN npm install --production
