@@ -2,10 +2,8 @@ name: Build and Push Microservices
 
 on:
   push:
-    branches: [ "main" ]
-  pull_request:         # Ye line add kar do
-    branches: [ "main" ] # Jab main mein merge ho tabhi push karega
-
+    branches: [ "feat/auth" ]
+  
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
