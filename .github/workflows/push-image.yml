@@ -27,7 +27,9 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           # context batata hai ki Dockerfile kahan hai
-          context: ./apps/${{ matrix.service }}
+          context: . 
+          # Dockerfile ka sahi rasta batao
+          file: ./apps/${{ matrix.service }}/Dockerfile 
           push: true
           # Image ka naam: username/service-name:latest
           tags: |
