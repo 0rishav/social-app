@@ -34,7 +34,7 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: eu-north-1 
 
-      # 4. Build folder ko S3 pe Sync karna
+      # 4. Build folder ko S3 pe Sync 
       - name: Deploy to S3
         run: |
           aws s3 sync ./frontend/dist s3://${{ secrets.AWS_S3_BUCKET_NAME }} --delete
