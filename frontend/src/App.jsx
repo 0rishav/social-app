@@ -10,7 +10,7 @@ import Footer from "./components/Footer";
 import Studio from "./pages/studio/Studio";
 const App = () => {
   return (
-    <Router basename="/social-app">
+    <Router>
       <div className="bg-ivory min-h-screen selection:bg-gold selection:text-charcoal">
         {/* Header sabhi pages par dikhega */}
         <Header />
