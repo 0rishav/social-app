@@ -1,16 +1,14 @@
-name: Build and Push Microservices
+name: Build, Verify and Push Microservices
 
 on:
   push:
     branches: [ "feat/auth" ]
-  
+
 jobs:
-  build-and-push:
+  build-verify-push:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        # Yahan apni dono services ke folder names daal do
-        # Yahan apni dono services ke folder names daal do
         service: [identity-service, post-service]
     
     steps:
@@ -23,15 +21,47 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Build and Push ${{ matrix.service }}
+      # 1. Build Image Locally (No Push yet)
+      - name: Build Local Image
         uses: docker/build-push-action@v5
         with:
-          # context batata hai ki Dockerfile kahan hai
-          context: . 
-          # Dockerfile ka sahi rasta batao
-          file: ./apps/${{ matrix.service }}/Dockerfile 
+          context: .
+          file: ./apps/${{ matrix.service }}/Dockerfile
+          push: false # Abhi push nahi karenge
+          load: true  # Isse image local docker daemon mein load ho jayegi
+          tags: ${{ matrix.service }}:test
+
+      # 2. Run Container and Verify (Health Check Loop)
+      - name: Verify Container Health
+        run: |
+          echo "Starting container for ${{ matrix.service }}..."
+          docker run -d --name test-container ${{ matrix.service }}:test
+          
+          # 3-4 baar check karne ka loop (Har 5 second pe)
+          for i in {1..4}; do
+            echo "Attempt $i: Checking if container is running..."
+            if [ "$(docker inspect -f '{{.State.Running}}' test-container)" == "true" ]; then
+              echo "✅ Container is running!"
+              docker logs test-container | tail -n 10
+              # Yahan tu 'curl' bhi maar sakta hai agar port pata hai
+            else
+              echo "Container crashed!"
+              docker logs test-container
+              exit 1
+            fi
+            sleep 5
+          done
+          
+          echo "Final Check: Container passed sanity test!"
+          docker stop test-container && docker rm test-container
+
+      # 3. Final Push (Only if verification passed)
+      - name: Push to Docker Hub
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./apps/${{ matrix.service }}/Dockerfile
           push: true
-          # Image ka naam: username/service-name:latest
           tags: |
             ${{ secrets.DOCKER_USERNAME }}/${{ matrix.service }}:v5
             ${{ secrets.DOCKER_USERNAME }}/${{ matrix.service }}:${{ github.run_number }}
