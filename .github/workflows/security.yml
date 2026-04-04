@@ -63,6 +63,7 @@ jobs:
           format: 'table'
           exit-code: '1' # AGAR CRITICAL MILE TOH YAHI FAIL KAR DO
           severity: 'CRITICAL,HIGH'
+          trivy-config: --light --clear-cache
 
   # STEP 4: Post Service Build & Scan
   build-and-scan-post:
