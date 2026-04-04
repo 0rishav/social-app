@@ -10,13 +10,11 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Build Child Container
-        run: |
-          cd apps/identity-service
-          docker build -t identity .
+      - name: Build Identity Service
+        run: docker build -t identity -f apps/identity-service/Dockerfile .
 
-          cd ../post-service
-          docker build -t post .
+      - name: Build Post Service
+        run: docker build -t post -f apps/post-service/Dockerfile .
           
       - name: Verify
         run: docker images
