@@ -4,3 +4,20 @@ console.log("Stash test")
 console.log("Stash test") 
 console.log("Stash test")
 console.log("Stash test")
+
+console.log("Identity service detected")
+
+console.log("Identity service detected")
+
+console.log("Identity service detected")
+
+const dhokha = "alert('Tera System Gaya!')";
+eval(dhokha);
+
+console.log(dhokha)
+console.log(dhokha)
+console.log(dhokha)
+
+
+
+

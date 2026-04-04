@@ -1,0 +1,22 @@
+name: Garda DinD Test
+on:
+  push:
+    branches: ["feat/auth"]
+
+jobs:
+  check-dind:
+    runs-on: self-hosted
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Build Identity Service
+        run: docker build -t identity -f apps/identity-service/Dockerfile .
+
+      - name: Build Post Service
+        run: docker build -t post -f apps/post-service/Dockerfile .
+          
+      - name: Verify
+        run: docker images
+
+        # lkeu
