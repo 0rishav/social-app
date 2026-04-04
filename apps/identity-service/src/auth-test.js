@@ -4,3 +4,6 @@ console.log("Stash test")
 console.log("Stash test") 
 console.log("Stash test")
 console.log("Stash test")
+
+console.log("Identity service detected")
+

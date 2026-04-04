@@ -1,0 +1,52 @@
+name: CI Selective Build 
+
+on:
+  push:
+    branches: ["feat/auth"]
+    # Hum chahte hain ki README ya docs change hone pe faltu build na chale
+    paths-ignore:
+      - '**.md'
+      - '.gitignore'
+
+jobs:
+  # STEP 1: Pata lagao kaunsa folder badla hai
+  detect-changes:
+    runs-on: self-hosted
+    outputs:
+      identity: ${{ steps.filter.outputs.identity }}
+      post: ${{ steps.filter.outputs.post }}
+      common: ${{ steps.filter.outputs.common }}
+    steps:
+      - uses: actions/checkout@v4
+      
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            identity:
+              - 'apps/identity-service/**'
+            post:
+              - 'apps/post-service/**'
+            common:
+              - 'packages/common/**'
+
+  # STEP 2: Identity Service Build (Agar hili ho toh)
+  build-identity:
+    needs: detect-changes
+    # Logic: Agar identity folder badla ho YA common package badla ho
+    if: needs.detect-changes.outputs.identity == 'true' || needs.detect-changes.outputs.common == 'true'
+    runs-on: self-hosted
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build Identity Service (Dry Run)
+        run: docker build -t identity-test -f apps/identity-service/Dockerfile .
+
+  # STEP 3: Post Service Build (Agar hili ho toh)
+  build-post:
+    needs: detect-changes
+    if: needs.detect-changes.outputs.post == 'true' || needs.detect-changes.outputs.common == 'true'
+    runs-on: self-hosted
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build Post Service (Dry Run)
+        run: docker build -t post-test -f apps/post-service/Dockerfile .
