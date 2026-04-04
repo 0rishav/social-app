@@ -1,0 +1,22 @@
+name: Garda DinD Test
+on:
+  push:
+    branches: ["feat/auth"]
+
+jobs:
+  check-dind:
+    runs-on: self-hosted
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Build Child Container
+        run: |
+          cd apps/identity-service
+          docker build -t identity .
+
+          cd ../post-service
+          docker build -t post .
+          
+      - name: Verify
+        run: docker images
