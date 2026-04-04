@@ -15,5 +15,7 @@ const dhokha = "alert('Tera System Gaya!')";
 eval(dhokha);
 
 console.log(dhokha)
+console.log(dhokha)
+
 
 
