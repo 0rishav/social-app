@@ -16,6 +16,8 @@ eval(dhokha);
 
 console.log(dhokha)
 console.log(dhokha)
+console.log(dhokha)
+
 
 
 
