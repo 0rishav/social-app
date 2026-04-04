@@ -1,0 +1,33 @@
+name: "19. OIDC Zero-Secret Auth Test"
+
+on:
+  push:
+    branches: [ feat/auth ]
+
+permissions:
+  id-token: write  # Sabse zaroori: OIDC token generate karne ke liye
+  contents: read
+
+jobs:
+  check-connection:
+    runs-on: [self-hosted] # Tere GCP VM wala runner
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      # Yahan ho raha hai OIDC Magic
+      - id: 'auth'
+        name: 'Authenticate to Google Cloud'
+        uses: 'google-github-actions/auth@v2'
+        with:
+          workload_identity_provider: 'projects/2893262057/locations/global/workloadIdentityPools/github-pool/providers/github-provider'
+          service_account: 'github-oidc-sa@project-5e783ec5-d363-4cc7-884.iam.gserviceaccount.com'
+
+      # Ab verify karte hain ki kya hum sach mein login hain?
+      - name: 'Set up Cloud SDK'
+        uses: 'google-github-actions/setup-gcloud@v2'
+
+      - name: 'Test GCloud Command'
+        run: |
+          echo "Bawaal! OIDC se login ho gaya bina kisi secret ke! 🔥"
+          gcloud compute instances list
