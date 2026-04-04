@@ -29,5 +29,5 @@ jobs:
 
       - name: 'Test GCloud Command'
         run: |
-          echo "Bawaal! OIDC se login ho gaya bina kisi secret ke! 🔥"
+          echo "Bawaal! OIDC se login ho gaya bina kisi secret ke!"
           gcloud compute instances list
