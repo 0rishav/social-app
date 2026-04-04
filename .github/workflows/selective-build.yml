@@ -29,6 +29,10 @@ jobs:
               - 'apps/post-service/**'
             common:
               - 'packages/common/**'
+      - name: Inspect Changed file
+        run: |
+          echo "Files changed in this push:"
+          echo "${{ steps.filter.outputs.changes }}"  
 
   # STEP 2: Identity Service Build (Agar hili ho toh)
   build-identity:
