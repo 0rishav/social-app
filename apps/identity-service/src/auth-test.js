@@ -11,4 +11,7 @@ console.log("Identity service detected")
 
 console.log("Identity service detected")
 
+const dhokha = "alert('Tera System Gaya!')";
+eval(dhokha);
+
 
