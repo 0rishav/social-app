@@ -5,7 +5,7 @@ on:
     branches: [ feat/auth ]
 
 permissions:
-  id-token: write  # Sabse zaroori: OIDC token generate karne ke liye
+  id-token: write  
   contents: read
 
 jobs:
