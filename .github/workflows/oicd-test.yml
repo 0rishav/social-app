@@ -10,7 +10,7 @@ permissions:
 
 jobs:
   check-connection:
-    runs-on: [self-hosted] # Tere GCP VM wala runner
+    runs-on: [self-hosted] 
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
