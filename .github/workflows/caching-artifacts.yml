@@ -1,0 +1,62 @@
+name: CI/CD Pipeline with Frontend Directory
+on:
+  push:
+    branches: [ feat/auth ]
+
+jobs:
+  # --- JOB 1: BUILD ---
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      # 1. CACHING: Path ko update kiya hai taaki cache sahi jagah se uthaye
+      - name: Cache Node Modules
+        id: cache-npm
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          # Hash check frontend ke andar wale lock file ka hoga 👇
+          key: ${{ runner.os }}-node-${{ hashFiles('frontend/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      - name: Install Dependencies
+        # 'working-directory' use karne se baar-baar 'cd' nahi karna padta
+        working-directory: ./frontend 
+        run: npm ci
+
+      - name: Run Build
+        working-directory: ./frontend
+        run: npm run build
+
+      # 2. ARTIFACT UPLOAD: Path ab 'frontend/dist' hoga
+      - name: Upload Build Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-output
+          path: frontend/dist/ 
+          retention-days: 1
+
+  # --- JOB 2: TEST ---
+  test:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      # 3. ARTIFACT DOWNLOAD
+      - name: Download Build Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: build-output
+          # Isse hum wapis frontend ke folder mein hi daal rahe hain
+          path: frontend/dist/
+
+      - name: Run Unit Tests
+        working-directory: ./frontend
+        run: |
+          ls -R dist/ 
+          npm test

@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: post-cm
+data:
+  MONGO_HOST: "mongodb-svc"
+  MONGO_PORT: "27017"
+  MONGO_DB_NAME: "post_db"
+  POST_PORT: "8002"
+  POST_MONGO_URI: "mongodb://mongodb-svc:27017/post_db"
+  NODE_ENV: "development"
+  LOG_LEVEL: "info"
+  REDIS_URL: "redis://redis-svc:6379"
+  KAFKA_BROKERS: "kafka-svc:9092"
+  POST_SERVICE_URL: "http://post-svc:80"
+  WEB_CONCURRENCY: "1"

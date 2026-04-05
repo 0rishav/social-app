@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: identity-cm
+data:
+  MONGO_HOST: "mongodb-svc"
+  MONGO_PORT: "27017"
+  MONGO_DB_NAME: "identity_db"
+  IDENTITY_PORT: "8001"
+  IDENTITY_MONGO_URI: "mongodb://mongodb-svc:27017/identity_db"
+  NODE_ENV: "development"
+  LOG_LEVEL: "info"
+  REDIS_HOST: "redis-svc"
+  KAFKA_BROKER: "kafka-svc:9092"
+  IDENTITY_SERVICE_URL: "http://identity-svc:80"

@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: social-app-limits
+spec:
+  limits:
+  - default:                # Naye Pod ko ye Limit milegi (Hard Cap)
+      memory: "512Mi"
+      cpu: "500m"
+    defaultRequest:         # Naye Pod ko ye Request milegi (Guarantee)
+      memory: "256Mi"
+      cpu: "200m"
+    max:                    # Kisi ki aukat 1GB se zyada nahi hogi
+      memory: "1Gi"
+      cpu: "1"
+    min:                    # 100MB se kam ki request allow nahi
+      memory: "100Mi"
+      cpu: "100m"
+    type: Container

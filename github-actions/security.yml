@@ -1,0 +1,94 @@
+name: Professional Secure Selective CI/CD
+
+on:
+  push:
+    branches: ["feat/auth"]
+    paths-ignore:
+      - '**.md'
+      - '.gitignore'
+
+jobs:
+  # STEP 1: Change Detection
+  detect-changes:
+    runs-on: ubuntu-latest
+    outputs:
+      identity: ${{ steps.filter.outputs.identity }}
+      post: ${{ steps.filter.outputs.post }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          base: ${{ github.event.before }}
+          filters: |
+            identity:
+              - 'apps/identity-service/**'
+            post:
+              - 'apps/post-service/**'
+
+  # STEP 2: Source Code Security Scan (Parallel Job)
+  # Isse 'needs' ki zaroorat nahi hai, ye shuru hote hi chal jayega
+  static-security-scan:
+    runs-on: ubuntu-latest
+    permissions:
+      security-events: write
+      actions: read
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - name: Initialize CodeQL (SAST)
+        uses: github/codeql-action/init@v3
+        with:
+          languages: javascript
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v3
+
+  # STEP 3: Identity Service Build & Scan
+  build-and-scan-identity:
+    needs: [detect-changes, static-security-scan]
+    if: needs.detect-changes.outputs.identity == 'true'
+    runs-on: self-hosted
+    steps:
+      - uses: actions/checkout@v4
+      
+      # Build
+      - name: Build Identity Image
+        run: docker build -t identity-service:${{ github.sha }} -f apps/identity-service/Dockerfile .
+
+      # Trivy Image Scan (Yahan khel shuru hota hai)
+      - name: Scan Identity Image for Vulnerabilities
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: 'identity-service:${{ github.sha }}'
+          format: 'table'
+          exit-code: '1' # AGAR CRITICAL MILE TOH YAHI FAIL KAR DO
+          severity: 'CRITICAL,HIGH'
+          trivy-config: --light --clear-cache
+
+  # STEP 4: Post Service Build & Scan
+  build-and-scan-post:
+    needs: [detect-changes, static-security-scan]
+    if: needs.detect-changes.outputs.post == 'true'
+    runs-on: self-hosted
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Build Post Image
+        run: docker build -t post-service:${{ github.sha }} -f apps/post-service/Dockerfile .
+
+      - name: Scan Post Image for Vulnerabilities
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: 'post-service:${{ github.sha }}'
+          format: 'table'
+          exit-code: '1'
+          severity: 'CRITICAL,HIGH'
+
+  # STEP 5: Final Deployment (Sirf tab jab sab Green ho)
+  deploy:
+    needs: [build-and-scan-identity, build-and-scan-post]
+    if: always() && (needs.build-and-scan-identity.result == 'success' || needs.build-and-scan-post.result == 'success')
+    runs-on: self-hosted
+    steps:
+      - name: Deploy to Production/Staging
+        run: echo "Deploying the secure and scanned images..."

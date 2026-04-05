@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: overlimit-pod
+spec:
+  containers:
+  - name: nginx
+    image: nginx
+    resources:
+      limits:
+        memory: "2Gi" # <--- Hamare 1Gi ke rule ko tod raha hai
