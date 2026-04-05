@@ -1,0 +1,10 @@
+USER-SUPPLIED VALUES:
+hubble:
+  enabled: true
+  relay:
+    enabled: true
+  ui:
+    enabled: true
+k8sServiceHost: 10.123.237.171
+k8sServicePort: 6443
+kubeProxyReplacement: true

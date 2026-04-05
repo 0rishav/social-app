@@ -1,0 +1,37 @@
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: post-deploy-hpa
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: post-deploy
+  minReplicas: 1      # Shanti mein 2 pods rahenge
+  maxReplicas: 5     # Load aane pe 10 tak jayenge
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 70 # 50% CPU hit hote hi scale up shuru
+  - type: Resource
+    resource:
+      name: memory
+      target:
+        type: Utilization
+        averageUtilization: 80 # Agar RAM 80% touch kare toh bhi scale karo
+  behavior: # Scaling behavior ko thoda "aggressive" rakhte hain
+    scaleUp:
+      stabilizationWindowSeconds: 0
+      policies:
+      - type: Percent
+        value: 100
+        periodSeconds: 15
+    scaleDown:
+      stabilizationWindowSeconds: 300 # Load hatne ke 5 min baad hi pods delete karna
+      policies:
+      - type: Percent
+        value: 100
+        periodSeconds: 15
