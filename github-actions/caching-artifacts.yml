@@ -1,7 +1,9 @@
 name: CI/CD Pipeline with Frontend Directory
 on:
   push:
-    branches: [ feat/auth ]
+    branches: [ main ]
+  pull:
+    branches: [ main ]
 
 jobs:
   # --- JOB 1: BUILD ---

@@ -1,0 +1,32 @@
+name: Test GCP OIDC Connection
+
+on:
+  workflow_dispatch: 
+
+permissions:
+  id-token: write 
+  contents: read
+
+jobs:
+  test-connection:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - id: 'auth'
+        name: 'Authenticate to Google Cloud'
+        uses: 'google-github-actions/auth@v2'
+        with:
+          workload_identity_provider: 'projects/2893262057/locations/global/workloadIdentityPools/social-app-pool/providers/social-app-provider'
+          service_account: 'github-oidc-sa@project-5e783ec5-d363-4cc7-884.iam.gserviceaccount.com'
+
+      - name: 'Set up Cloud SDK'
+        uses: 'google-github-actions/setup-gcloud@v2'
+
+      - name: 'Verify Connection'
+        run: |
+          echo "Connection Established! Checking Identity..."
+          gcloud auth list
+          echo "Listing Service Accounts in Project to verify permissions:"
+          gcloud iam service-accounts list
