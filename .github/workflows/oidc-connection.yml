@@ -1,7 +1,9 @@
 name: Test GCP OIDC Connection
 
 on:
-  workflow_dispatch: 
+  push:
+    branches:
+      - feat/auth
 
 permissions:
   id-token: write 
