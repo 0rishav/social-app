@@ -41,6 +41,14 @@ spec:
           - configMapRef:
               name: identity-cm
         command: ['sh', '-c', "until nc -zv $MONGO_HOST $MONGO_PORT; do echo 'Waiting...'; sleep 2; done"]
+        resources:
+          limits:
+            cpu: "100m"
+            memory: "128Mi"
+          requests:
+            cpu: "100m"
+            memory: "128Mi"
+        
       containers:
       - name: identity-container
         image: raunakraj010/identity-service:final
