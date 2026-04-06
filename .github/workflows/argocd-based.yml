@@ -9,7 +9,7 @@ on:
 
 permissions:
   id-token: write
-  contents: read
+  contents: write # Git push ke liye permission
 
 env:
   PROJECT_ID: project-5e783ec5-d363-4cc7-884
@@ -17,11 +17,9 @@ env:
   REPO_NAME: social-app-repo
 
 jobs:
-  # 🔍 STEP 1: Change Detection (Single Job for all)
   detect-changes:
     runs-on: ubuntu-latest
     outputs:
-      # Isko JSON format me pass karenge matrix ke liye
       services: ${{ steps.filter.outputs.changes }}
       common: ${{ steps.filter.outputs.common }}
     steps:
@@ -29,39 +27,65 @@ jobs:
       - uses: dorny/paths-filter@v3
         id: filter
         with:
-          base: ${{ github.event.before }}
           filters: |
             identity-service: 'apps/identity-service/**'
             post-service: 'apps/post-service/**'
             common: 'packages/common/**'
 
-  # 🚀 STEP 2: Universal Build Job (Matrix + Selective)
   build:
     needs: detect-changes
     if: ${{ needs.detect-changes.outputs.services != '[]' || needs.detect-changes.outputs.common == 'true' }}
     runs-on: ubuntu-latest
     strategy:
-      fail-fast: false
       matrix:
         service: ${{ fromJSON(needs.detect-changes.outputs.common == 'true' && '["identity-service", "post-service"]' || needs.detect-changes.outputs.services) }}
-    
     steps:
       - uses: actions/checkout@v4
-
-      - name: 'Authenticate to GCP'
-        uses: 'google-github-actions/auth@v2'
+      - uses: 'google-github-actions/auth@v2'
         with:
           workload_identity_provider: 'projects/2893262057/locations/global/workloadIdentityPools/social-app-pool/providers/social-app-provider'
           service_account: 'github-oidc-sa@project-5e783ec5-d363-4cc7-884.iam.gserviceaccount.com'
-
-      - name: 'Set up Cloud SDK'
-        uses: 'google-github-actions/setup-gcloud@v2'
-
       - name: 'Docker Auth'
         run: gcloud auth configure-docker ${{ env.GAR_LOCATION }}-docker.pkg.dev
-
+      
       - name: Build and Push
         run: |
-          IMAGE_NAME="${{ matrix.service }}"
-          docker build -t ${{ env.GAR_LOCATION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPO_NAME }}/$IMAGE_NAME:${{ github.sha }} -f apps/$IMAGE_NAME/Dockerfile .
-          docker push ${{ env.GAR_LOCATION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPO_NAME }}/$IMAGE_NAME:${{ github.sha }}
+          FULL_IMAGE_NAME="${{ env.GAR_LOCATION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPO_NAME }}/${{ matrix.service }}"
+          docker build -t $FULL_IMAGE_NAME:${{ github.sha }} -f apps/${{ matrix.service }}/Dockerfile .
+          docker push $FULL_IMAGE_NAME:${{ github.sha }}
+
+  # 🚀 Naya Job: Saare manifests ek saath update karne ke liye
+  update-manifests:
+    needs: [detect-changes, build]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Full history for pushing back
+
+      - name: Update Kustomize Tags
+        run: |
+          cd k8s-manifest
+          SERVICES='${{ needs.detect-changes.outputs.services }}'
+          COMMON='${{ needs.detect-changes.outputs.common }}'
+          
+          # Agar common package change hua hai toh sab update karo, warna sirf changed services
+          if [ "$COMMON" == "true" ]; then
+            ALL_SERVICES=("identity-service" "post-service")
+          else
+            # JSON string ko bash array me convert karna
+            ALL_SERVICES=$(echo $SERVICES | jq -r '.[]')
+          fi
+
+          for SERVICE in ${ALL_SERVICES[@]}; do
+            FULL_IMAGE_NAME="${{ env.GAR_LOCATION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPO_NAME }}/$SERVICE"
+            kustomize edit set image $FULL_IMAGE_NAME=$FULL_IMAGE_NAME:${{ github.sha }}
+          done
+
+      - name: Commit and Push
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add k8s-manifest/kustomization.yaml
+          git commit -m "chore: update multiple service images to ${{ github.sha }} [skip ci]" || echo "No changes"
+          git push origin feat/auth
