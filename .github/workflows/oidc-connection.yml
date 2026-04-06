@@ -3,7 +3,7 @@ name: Test GCP OIDC Connection
 on:
   push:
     branches:
-      - main 
+      - feat/auth
 
 permissions:
   id-token: write 
