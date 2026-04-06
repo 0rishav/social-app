@@ -15,6 +15,12 @@ spec:
       containers:
       - name: zookeeper
         image: zookeeper:3.9.5
+        resources:           # <--- YE BHI ADD KARO
+          requests:
+            memory: "256Mi"
+            cpu: "100m"
+          limits:
+            memory: "512Mi"
         env:
         - name: ALLOW_ANONYMOUS_LOGIN
           value: "yes"

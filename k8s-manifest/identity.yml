@@ -44,6 +44,13 @@ spec:
       containers:
       - name: identity-container
         image: raunakraj010/identity-service:final
+        resources:           # <--- YE ADD KARO
+          requests:
+            memory: "512Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
         volumeMounts:
         - name: my-config-map
           mountPath: "/etc/config"
