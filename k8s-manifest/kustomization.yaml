@@ -4,7 +4,7 @@ kind: Kustomization
 resources:
   - identity.yml
   - kafka.yml
-  - zookeeper.yml
+  - zookepper.yml
   - redis.yml
   - post.yml
   - configMap.yml
