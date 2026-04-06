@@ -2,21 +2,21 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
 resources:
-  - identity.yml
-  - kafka.yml
-  - zookepper.yml
-  - redis.yml
-  - post.yml
-  - configMap.yml
-  - mongodb-sts.yml
-  - app-service-account.yml
-  - storage-class.yml
-  - cilium-gateway.yml
-  - final-cluster-quota.yml
-  - postConfigMap.yml
-  - post-app-hpa.yml
+- identity.yml
+- kafka.yml
+- zookepper.yml
+- redis.yml
+- post.yml
+- configMap.yml
+- mongodb-sts.yml
+- app-service-account.yml
+- storage-class.yml
+- cilium-gateway.yml
+- final-cluster-quota.yml
+- postConfigMap.yml
+- post-app-hpa.yml
 
 images:
 - name: us-central1-docker.pkg.dev/project-5e783ec5-d363-4cc7-884/social-app-repo/identity-service
   newName: us-central1-docker.pkg.dev/project-5e783ec5-d363-4cc7-884/social-app-repo/identity-service
-  newTag: daf82d470c52f2a7f5b3f12412637aebf2885b8d
+  newTag: 0823afa34349c85055e4adfdbd804f061e68be8f
