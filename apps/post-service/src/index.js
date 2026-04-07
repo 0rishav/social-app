@@ -29,7 +29,7 @@ console.log("Testing Cache")
 
 const kafka = new Kafka({
   clientId: "post-service",
-  brokers: ["localhost:9092"],
+  brokers: process.env.KAFKA_BROKERS,
 });
 
 const TOPIC_NAME = "post-writes";

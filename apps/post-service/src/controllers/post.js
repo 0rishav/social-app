@@ -8,7 +8,7 @@ import { BSON } from 'bson';
 import { Kafka, Partitioners } from 'kafkajs';
 
 
-const kafka = new Kafka({ brokers: ['localhost:9092'] });
+const kafka = new Kafka({ brokers: process.env.KAFKA_BROKERS });
 const producer = kafka.producer({createPartitioner: Partitioners.DefaultPartitioner});
 await producer.connect();
 
