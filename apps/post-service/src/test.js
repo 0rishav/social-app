@@ -4,6 +4,8 @@ let Identity = "Not Hello"
 console.log(post)
 
 console.log(Identity)
+console.log(Identity)
+
 
 
 
