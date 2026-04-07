@@ -99,41 +99,52 @@ if (cluster.isPrimary) {
   });
 } else {
   // 🚀 WORKER SIDE (Dedicated Roles)
+  // 🚀 WORKER SIDE (Smart Hybrid Roles)
   const startWorker = async () => {
     try {
       await connectDB();
-      const isConsumer = cluster.worker.id <= 7;
+      
+      const totalWorkers = parseInt(process.env.WEB_CONCURRENCY || "1", 10);
+      const workerId = cluster.worker.id;
+      
+      const isConsumer = totalWorkers === 1 || workerId <= 7;
+      const isProducer = totalWorkers === 1 || workerId > 7;
 
+      let producer = null;
+
+      // --- 📥 CONSUMER ROLE ---
       if (isConsumer) {
-        console.log(
-          `📥 Consumer Worker ${process.pid} (ID: ${cluster.worker.id}) Started`,
-        );
-
+        console.log(`📥 Consumer Worker ${process.pid} (ID: ${workerId}) Started`);
         await startPostConsumer(kafka).catch((err) =>
-          console.error(`❌ Consumer Error:`, err),
+          console.error(`❌ Consumer Error:`, err)
         );
+      }
 
-      } else {
-        console.log(
-          `📡 Producer Worker ${process.pid} (ID: ${cluster.worker.id}) Started`,
-        );
-
-        const producer = kafka.producer();
+      // --- 📡 PRODUCER / API ROLE ---
+      if (isProducer) {
+        console.log(`📡 Producer/API Worker ${process.pid} (ID: ${workerId}) Started`);
+        
+        producer = kafka.producer({
+          createPartitioner: Partitioners.DefaultPartitioner
+        });
         await producer.connect();
 
         const server = http.createServer(async (req, res) => {
-          res.status = (code) => {
-            res.statusCode = code;
-            return res;
-          };
+          // Helper methods
+          res.status = (code) => { res.statusCode = code; return res; };
           res.json = (data) => {
             res.setHeader("Content-Type", "application/json");
             res.end(JSON.stringify(data));
           };
 
+          // 1. 🏥 CRITICAL: Global Health Check for Startup Probe
+          if (req.url === '/health') {
+            return res.status(200).json({ success: true, status: "UP" });
+          }
+
+          // 2. Body Parsing & Routing
           let chunks = [];
           req.on("data", (chunk) => chunks.push(chunk));
-
           req.on("end", async () => {
             try {
               const rawBody = Buffer.concat(chunks);
@@ -149,18 +160,19 @@ if (cluster.isPrimary) {
                 res.status(404).json({ success: false, message: "Not Found" });
               }
             } catch (err) {
-              res.status(400).json({ success: false, message: "Invalid JSON" });
+              res.status(400).json({ success: false, message: "Invalid JSON or Server Error" });
             }
           });
         });
 
         const TCP_BACKLOG = 4096; 
         server.listen(PORT, "0.0.0.0", TCP_BACKLOG, () => {
-          console.log(`API Server Worker ${process.pid} Up on PORT:${PORT}`);
+          console.log(`🚀 API Server Worker ${process.pid} Up on PORT:${PORT}`);
         });
       }
+
     } catch (error) {
-      console.error(`Startup Error:`, error.stack);
+      console.error(`Startup Error for Worker ${cluster.worker.id}:`, error.stack);
       process.exit(1);
     }
   };

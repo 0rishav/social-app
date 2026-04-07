@@ -13,4 +13,4 @@ data:
   REDIS_URL: "redis://redis-svc:6379"
   KAFKA_BROKERS: "kafka-svc:9092"
   POST_SERVICE_URL: "http://post-svc:80"
-  WEB_CONCURRENCY: "1"
+  WEB_CONCURRENCY: "2"
