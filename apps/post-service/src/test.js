@@ -1,21 +1,9 @@
-console.log("Post changes detected")
+let post = "Hello"
+let Identity = "Not Hello"
 
-console.log("Post changes detected")
+console.log(post)
 
-console.log("Post changes detected")
-
-console.log("Post changes detected")
-
-
-console.log("Post changes detected")
-
-console.log("Post changes detected")
-
-console.log("Post changes detected")
-
-console.log("Post changes detected")
-
-console.log("Post changes detected")
+console.log(Identity)
 
 
 
