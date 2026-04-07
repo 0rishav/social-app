@@ -27,9 +27,13 @@ const WORKER_COUNT = process.env.WEB_CONCURRENCY
 
 console.log("Testing Cache")
 
+const brokerConfig = process.env.KAFKA_BROKERS 
+  ? process.env.KAFKA_BROKERS.split(",").map(b => b.trim()) 
+  : ["kafka-svc:9092"];
+
 const kafka = new Kafka({
   clientId: "post-service",
-  brokers: process.env.KAFKA_BROKERS,
+  brokers: brokerConfig, 
 });
 
 const TOPIC_NAME = "post-writes";
