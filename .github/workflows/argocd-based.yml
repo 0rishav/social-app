@@ -107,23 +107,16 @@ jobs:
           ARGOCD_SERVER: "35.239.135.227" # Tera LoadBalancer IP
           ARGOCD_TOKEN: ${{ secrets.ARGOCD_TOKEN }} # Isko GitHub Secrets mein daalna hoga
         run: |
-          # 1. Login using Token (Secure way for CI/CD)
-          argocd login $ARGOCD_SERVER --token $ARGOCD_TOKEN --insecure
-
-          # 2. Extract Services to Sync
-          SERVICES='${{ needs.detect-changes.outputs.services }}'
-          COMMON='${{ needs.detect-changes.outputs.common }}'
+          # 1. Direct server configure karo bina login prompt ke
+          argocd cluster add default --server $ARGOCD_SERVER --auth-token $ARGOCD_TOKEN --insecure --yes || true
           
-          if [ "$COMMON" == "true" ]; then
-            SYNC_APPS=("identity-service" "post-service")
-          else
-            SYNC_APPS=$(echo $SERVICES | jq -r '.[]')
-          fi
-
-          # 3. Trigger Sync for each changed service
+          # ALTERNATE (Agar upar wala na chale): Context set karke token use karo
+          argocd context --insecure --server $ARGOCD_SERVER --user admin
+          
+          # 2. Sync Commands (Token ko global flag ki tarah pass karo)
           for APP in ${SYNC_APPS[@]}; do
             echo "Triggering instant sync for $APP..."
-            # Refresh maarta hai polling bypass karne ke liye aur phir sync
-            argocd app get $APP --refresh --insecure
-            argocd app sync $APP --insecure --async
+            # Yahan --auth-token flag har command ke saath jayega
+            argocd app get $APP --refresh --insecure --auth-token $ARGOCD_TOKEN --server $ARGOCD_SERVER
+            argocd app sync $APP --insecure --async --auth-token $ARGOCD_TOKEN --server $ARGOCD_SERVER
           done
