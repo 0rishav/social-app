@@ -18,4 +18,4 @@ resources:
 images:
 - name: us-central1-docker.pkg.dev/project-5e783ec5-d363-4cc7-884/social-app-repo/identity-service
   newName: us-central1-docker.pkg.dev/project-5e783ec5-d363-4cc7-884/social-app-repo/identity-service
-  newTag: ad65771c6bedb7c9ed89887517466ec7c0245feb
+  newTag: f6afdb6a402e92c4289c3c1527359f69f26040ba
