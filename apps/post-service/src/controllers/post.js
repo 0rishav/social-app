@@ -8,8 +8,15 @@ import { BSON } from 'bson';
 import { Kafka, Partitioners } from 'kafkajs';
 
 
-const kafka = new Kafka({ brokers: process.env.KAFKA_BROKERS });
-const producer = kafka.producer({createPartitioner: Partitioners.DefaultPartitioner});
+const kafka = new Kafka({
+  clientId: "post-service",
+  brokers: process.env.KAFKA_BROKERS ? process.env.KAFKA_BROKERS.split(",") : ["kafka-svc:9092"]
+});
+
+const producer = kafka.producer({
+  createPartitioner: Partitioners.DefaultPartitioner
+});
+
 await producer.connect();
 
 const sendResponse = (res, status, data) => {
