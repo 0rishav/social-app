@@ -21,4 +21,4 @@ images:
   newTag: 7e0b317f85557d76bb06a32d9bc52fc54c30f21a
 - name: raunakraj010/post-service
   newName: us-central1-docker.pkg.dev/project-5e783ec5-d363-4cc7-884/social-app-repo/post-service
-  newTag: b38126e96d8224ae3ff57d11b68217a4ca7f1e2a
+  newTag: 18f7bb4dedcb5484858636c9eb64408d1e11702a
