@@ -23,7 +23,7 @@ import { updateTrendingTagsCache } from "./utils/cacheWarmer.js";
 import { startPostConsumer } from "./utils/postConsumer.js";
 
 const PORT = process.env.POST_PORT || 5001;
-const WORKER_COUNT = 14;
+const WORKER_COUNT = process.env.WEB_CONCURRENCY
 
 console.log("Testing Cache")
 
