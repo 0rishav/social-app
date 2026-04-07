@@ -91,3 +91,39 @@ jobs:
           git add k8s-manifest/kustomization.yaml
           git commit -m "chore: update multiple service images to ${{ github.sha }} [skip ci]" || echo "No changes"
           git push origin feat/auth
+
+  argocd-sync:
+    needs: [detect-changes, update-manifests]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install ArgoCD CLI
+        run: |
+          curl -sSL -o argocd-linux-amd64 https://github.com/argoproj/argo-cd/releases/latest/download/argocd-linux-amd64
+          sudo install -m 555 argocd-linux-amd64 /usr/local/bin/argocd
+          rm argocd-linux-amd64
+
+      - name: Login and Sync ArgoCD
+        env:
+          ARGOCD_SERVER: "35.239.135.227" # Tera LoadBalancer IP
+          ARGOCD_TOKEN: ${{ secrets.ARGOCD_TOKEN }} # Isko GitHub Secrets mein daalna hoga
+        run: |
+          # 1. Login using Token (Secure way for CI/CD)
+          argocd login $ARGOCD_SERVER --token $ARGOCD_TOKEN --insecure
+
+          # 2. Extract Services to Sync
+          SERVICES='${{ needs.detect-changes.outputs.services }}'
+          COMMON='${{ needs.detect-changes.outputs.common }}'
+          
+          if [ "$COMMON" == "true" ]; then
+            SYNC_APPS=("identity-service" "post-service")
+          else
+            SYNC_APPS=$(echo $SERVICES | jq -r '.[]')
+          fi
+
+          # 3. Trigger Sync for each changed service
+          for APP in ${SYNC_APPS[@]}; do
+            echo "Triggering instant sync for $APP..."
+            # Refresh maarta hai polling bypass karne ke liye aur phir sync
+            argocd app get $APP --refresh --insecure
+            argocd app sync $APP --insecure --async
+          done
