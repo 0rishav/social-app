@@ -18,4 +18,7 @@ resources:
 images:
 - name: raunakraj010/identity-service
   newName: us-central1-docker.pkg.dev/project-5e783ec5-d363-4cc7-884/social-app-repo/identity-service
-  newTag: 3bb9c1b657b4315a9cbc99138e83cfb1c5d9ef7e
+  newTag: a08cd0cbc5683a913eeea719c5cea1d497977239
+- name: raunakraj010/post-service
+  newName: us-central1-docker.pkg.dev/project-5e783ec5-d363-4cc7-884/social-app-repo/post-service
+  newTag: a08cd0cbc5683a913eeea719c5cea1d497977239
