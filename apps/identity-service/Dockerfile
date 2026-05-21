@@ -1,26 +1,25 @@
-# Stage 1: Build/Install
-FROM node:20-alpine
+FROM node:20-alpine as builder
+
 WORKDIR /app
 
-# 3. Layer Caching: Pehle saari package.json files copy karo
-# Root package.json
 COPY package*.json ./
-# Service package.json
-COPY apps/identity-service/package*.json ./apps/identity-service/
-# Shared Packages package.json (Dependency chain)
 COPY packages/common/package*.json ./packages/common/
+COPY apps/identity-service/package*.json ./apps/identity-service/
 
+RUN npm install 
 
-# 4. Dependencies install karo (Root se taaki link ho jayein)
-RUN npm install --production
+COPY packages/ ./packages/
+COPY apps/identity-service/ ./apps/identity-service/
 
-# 5. Ab asli code copy karo (Post service + Shared logic)
-COPY apps/identity-service ./apps/identity-service
-COPY packages ./packages
+FROM node:20-alpine as runner
+WORKDIR /app
 
-# 6. Service folder ke andar jao
-WORKDIR /app/apps/identity-service
+COPY --from=builder --chown=node:node /app/node_modules ./node_modules
 
-# 7. Port (Post-service ka jo bhi port hai, maan lo 3001)
-EXPOSE 8002
-CMD ["npm", "start"]
+COPY --chown=node:node packages/ ./packages
+COPY --chown=node:node apps/identity-service/ ./apps/identity-service/
+
+USER node
+
+EXPOSE 8001
+CMD ["node","apps/identity-service/src/index.js"]
