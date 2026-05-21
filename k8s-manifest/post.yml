@@ -35,16 +35,37 @@ spec:
       - name: wait-for-mongo
         image: busybox:1.28
         command: ['sh', '-c', "until nc -zv mongodb-svc 27017; do echo 'Waiting for Mongo...'; sleep 2; done"]
+        resources:
+          limits:
+            cpu: "100m"
+            memory: "128Mi"
+          requests:
+            cpu: "100m"
+            memory: "128Mi"
 
       # 2. Wait for Redis
       - name: wait-for-redis
         image: busybox:1.28
         command: ['sh', '-c', "until nc -zv redis-svc 6379; do echo 'Waiting for Redis...'; sleep 2; done"]
+        resources:
+          limits:
+            cpu: "100m"
+            memory: "128Mi"
+          requests:
+            cpu: "100m"
+            memory: "128Mi"
 
       # 3. Wait for Kafka
       - name: wait-for-kafka
         image: busybox:1.28
         command: ['sh', '-c', "until nc -zv kafka-svc 9092; do echo 'Waiting for Kafka...'; sleep 2; done"]
+        resources:
+          limits:
+            cpu: "100m"
+            memory: "128Mi"
+          requests:
+            cpu: "100m"
+            memory: "128Mi"
 
       containers:
       - name: post-container

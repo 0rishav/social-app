@@ -8,9 +8,26 @@ import { BSON } from 'bson';
 import { Kafka, Partitioners } from 'kafkajs';
 
 
-const kafka = new Kafka({ brokers: ['localhost:9092'] });
-const producer = kafka.producer({createPartitioner: Partitioners.DefaultPartitioner});
-await producer.connect();
+const kafkaBrokers = process.env.KAFKA_BROKERS;
+
+const kafka = new Kafka({
+  clientId: "post-service",
+  // Strict check: Agar string khali hai ya length < 5 hai (e.g. "k:90") toh default lo
+  brokers: (kafkaBrokers && kafkaBrokers.trim().length > 0) 
+    ? kafkaBrokers.split(",").map(b => b.trim()) 
+    : ["kafka-svc:9092"] 
+});
+
+const producer = kafka.producer({
+  createPartitioner: Partitioners.DefaultPartitioner
+});
+
+try {
+    await producer.connect();
+    console.log("✅ Kafka Producer Connected");
+} catch (err) {
+    console.error("Kafka Connection Failed:", err.message);
+}
 
 const sendResponse = (res, status, data) => {
   res.writeHead(status, { "Content-Type": "application/json" });

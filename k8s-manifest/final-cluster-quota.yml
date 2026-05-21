@@ -5,15 +5,14 @@ metadata:
   namespace: default
 spec:
   hard:
-    # --- CPU Resources ---
-    requests.cpu: "4"
-    limits.cpu: "8"
+    
+    requests.cpu: "8"
+    limits.cpu: "16"
 
-    # --- Memory Resources ---
-    requests.memory: "4Gi"
-    limits.memory: "8Gi"
+    
+    requests.memory: "128Gi" 
+    limits.memory: "32Gi"
 
-    # --- Object Counts ---
-    pods: "10"
-    persistentvolumeclaims: "4"
-    services: "10"
+    pods: "20"
+    persistentvolumeclaims: "10"
+    services: "15"

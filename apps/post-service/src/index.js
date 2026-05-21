@@ -18,18 +18,22 @@ dotenv.config({ path: rootEnvPath });
 // 3. INTERNAL MODULES
 import { connectDB } from "./config/db.js";
 import { postRoutes } from "./routes/post.js";
-import { ErrorMiddleware } from "../../../packages/common/src/middleware/error.js";
+// import { ErrorMiddleware } from "../../../packages/common/src/middleware/error.js";
 import { updateTrendingTagsCache } from "./utils/cacheWarmer.js";
 import { startPostConsumer } from "./utils/postConsumer.js";
 
 const PORT = process.env.POST_PORT || 5001;
-const WORKER_COUNT = 14;
+const WORKER_COUNT = process.env.WEB_CONCURRENCY
 
 console.log("Testing Cache")
 
+const brokerConfig = process.env.KAFKA_BROKERS 
+  ? process.env.KAFKA_BROKERS.split(",").map(b => b.trim()) 
+  : ["kafka-svc:9092"];
+
 const kafka = new Kafka({
   clientId: "post-service",
-  brokers: ["localhost:9092"],
+  brokers: brokerConfig, 
 });
 
 const TOPIC_NAME = "post-writes";
@@ -95,66 +99,73 @@ if (cluster.isPrimary) {
   });
 } else {
   // 🚀 WORKER SIDE (Dedicated Roles)
+  // 🚀 WORKER SIDE (Smart Hybrid Roles)
   const startWorker = async () => {
     try {
       await connectDB();
-      const isConsumer = cluster.worker.id <= 7;
+      
+      const workerId = cluster.worker.id;
+      // Agar concurrency 1 hai toh worker 1 dono karega, 
+      // agar zyada hai toh ID 1-7 consumers, baaki producers.
+      const totalWorkers = parseInt(process.env.WEB_CONCURRENCY || "1", 10);
+      const isConsumer = totalWorkers === 1 || workerId <= 7;
+      const isProducer = totalWorkers === 1 || workerId > 7;
+
+      // 1. Create the Server First (Har worker ke liye)
+      const server = http.createServer(async (req, res) => {
+        res.status = (code) => { res.statusCode = code; return res; };
+        res.json = (data) => {
+          res.setHeader("Content-Type", "application/json");
+          res.end(JSON.stringify(data));
+        };
+
+        // 🏥 Startup/Liveness/Readiness Probe
+        if (req.url === '/health') {
+          return res.status(200).json({ status: "UP", workerId });
+        }
+
+        // Body parsing logic for API routes
+        let chunks = [];
+        req.on("data", (chunk) => chunks.push(chunk));
+        req.on("end", async () => {
+          try {
+            const rawBody = Buffer.concat(chunks);
+            req.body = rawBody.length > 0 ? JSON.parse(rawBody) : {};
+            
+            const routeKey = `${req.method}:${req.url.split("?")[0]}`;
+            const handler = postRoutes[routeKey];
+            if (handler) {
+              // Producer instance attached later if needed
+              req.producer = producer; 
+              await handler(req, res);
+            } else {
+              res.status(404).json({ success: false, message: "Not Found" });
+            }
+          } catch (err) {
+            res.status(400).json({ success: false, message: "Bad Request" });
+          }
+        });
+      });
+
+      // 2. Start Roles
+      let producer = null;
 
       if (isConsumer) {
-        console.log(
-          `📥 Consumer Worker ${process.pid} (ID: ${cluster.worker.id}) Started`,
-        );
-
-        await startPostConsumer(kafka).catch((err) =>
-          console.error(`❌ Consumer Error:`, err),
-        );
-
-      } else {
-        console.log(
-          `📡 Producer Worker ${process.pid} (ID: ${cluster.worker.id}) Started`,
-        );
-
-        const producer = kafka.producer();
-        await producer.connect();
-
-        const server = http.createServer(async (req, res) => {
-          res.status = (code) => {
-            res.statusCode = code;
-            return res;
-          };
-          res.json = (data) => {
-            res.setHeader("Content-Type", "application/json");
-            res.end(JSON.stringify(data));
-          };
-
-          let chunks = [];
-          req.on("data", (chunk) => chunks.push(chunk));
-
-          req.on("end", async () => {
-            try {
-              const rawBody = Buffer.concat(chunks);
-              req.body = rawBody.length > 0 ? JSON.parse(rawBody) : {};
-              req.producer = producer; 
-
-              const routeKey = `${req.method}:${req.url.split("?")[0]}`;
-              const handler = postRoutes[routeKey];
-
-              if (handler) {
-                await handler(req, res);
-              } else {
-                res.status(404).json({ success: false, message: "Not Found" });
-              }
-            } catch (err) {
-              res.status(400).json({ success: false, message: "Invalid JSON" });
-            }
-          });
-        });
-
-        const TCP_BACKLOG = 4096; 
-        server.listen(PORT, "0.0.0.0", TCP_BACKLOG, () => {
-          console.log(`API Server Worker ${process.pid} Up on PORT:${PORT}`);
-        });
+        console.log(`📥 Consumer Worker ${process.pid} (ID: ${workerId}) Active`);
+        await startPostConsumer(kafka).catch(e => console.error("Consumer Error:", e));
       }
+
+      if (isProducer) {
+        console.log(`📡 Producer Worker ${process.pid} (ID: ${workerId}) Active`);
+        producer = kafka.producer({ createPartitioner: Partitioners.DefaultPartitioner });
+        await producer.connect();
+      }
+
+      // 3. 🏁 Sabse Important: Har Worker Port 8002 par Listen karega
+      server.listen(PORT, "0.0.0.0", () => {
+        console.log(`✅ Worker ${workerId} Listening on Port ${PORT}`);
+      });
+
     } catch (error) {
       console.error(`Startup Error:`, error.stack);
       process.exit(1);

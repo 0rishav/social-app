@@ -18,6 +18,17 @@ console.log(dhokha)
 console.log(dhokha)
 console.log(dhokha)
 
+console.log(dhokha)
+
+console.log(dhokha)
+
+let access = true
+if(access){
+    console.log("Access granted")
+}
+
+
+
 
 
 
