@@ -1,30 +1,27 @@
-# 1. Base Image
-FROM node:20-alpine
+FROM node:20-alpine AS builder
 
-# 2. Monorepo ke liye Root Workdir
 WORKDIR /app
 
-# 3. Layer Caching: Pehle saari package.json files copy karo
-# Root package.json
 COPY package*.json ./
-# Service package.json
-COPY apps/post-service/package*.json ./apps/post-service/
-# Shared Packages package.json (Dependency chain)
 COPY packages/common/package*.json ./packages/common/
+COPY apps/post-service/package*.json ./apps/post-service/
 
+RUN npm install
 
-# 4. Dependencies install karo (Root se taaki link ho jayein)
-RUN npm install 
+COPY packages/ ./packages/
+COPY apps/post-service/ ./apps/post-service/
 
-# 5. Ab asli code copy karo (Post service + Shared logic)
-COPY apps/post-service ./apps/post-service
-COPY packages ./packages
+FROM node:20-alpine as runner
 
-# 6. Service folder ke andar jao
-WORKDIR /app/apps/post-service
+WORKDIR /app
 
-# 7. Port (Post-service ka jo bhi port hai, maan lo 3001)
+COPY --from=builder --chown node:node /app/node_modules ./node_modules
+
+COPY --chown node:node packages/ ./packages
+COPY --chown node:node apps/post-service ./apps/post-service
+
+USER node
+
 EXPOSE 8002
 
-# 8. Start command
-CMD ["npm", "start"]
+CMD ["node", "apps/post-service/src/index.js"]
