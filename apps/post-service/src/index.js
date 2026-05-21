@@ -18,7 +18,7 @@ dotenv.config({ path: rootEnvPath });
 // 3. INTERNAL MODULES
 import { connectDB } from "./config/db.js";
 import { postRoutes } from "./routes/post.js";
-import { ErrorMiddleware } from "../../../packages/common/src/middleware/error.js";
+// import { ErrorMiddleware } from "../../../packages/common/src/middleware/error.js";
 import { updateTrendingTagsCache } from "./utils/cacheWarmer.js";
 import { startPostConsumer } from "./utils/postConsumer.js";
 
