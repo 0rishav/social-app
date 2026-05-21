@@ -37,7 +37,7 @@ jobs:
         run: |
           SERVICE_NAME=$(git diff --name-only HEAD~1 HEAD | grep 'apps/' | head -n 1 | cut -d '/' -f 2)
           echo "Asli Dynamic Service Jo Badli Hai: $SERVICE_NAME"
-          docker build --no-cache -f apps/$SERVICE_NAME/Dockerfile -t rishav/$SERVICE_NAME:${{ github.sha }} .
+          docker build --no-cache -f apps/$SERVICE_NAME/Dockerfile -t raunakraj010/$SERVICE_NAME:${{ github.sha }} .
           
-          docker push rishav/$SERVICE_NAME:${{ github.sha }} 
+          docker push raunakraj010/$SERVICE_NAME:${{ github.sha }} 
 
