@@ -1,29 +1,29 @@
-name: 'Setup Node and NPM'
-description: 'Checkouts code, setups node and installs dependencies with caching'
+# name: 'Setup Node and NPM'
+# description: 'Checkouts code, setups node and installs dependencies with caching'
 
-# Inputs jo main.yml se aayenge
-inputs:
-  working-directory:
-    description: 'Path to the directory containing package.json'
-    required: true
-    default: './'
-  node-version:
-    description: 'Node.js version to use'
-    required: false
-    default: '20'
+# # Inputs jo main.yml se aayenge
+# inputs:
+#   working-directory:
+#     description: 'Path to the directory containing package.json'
+#     required: true
+#     default: './'
+#   node-version:
+#     description: 'Node.js version to use'
+#     required: false
+#     default: '20'
 
-runs:
-  using: "composite"
-  steps:
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: ${{ inputs.node-version }}
-        # Caching logic yahan built-in hai
-        cache: 'npm'
-        cache-dependency-path: ${{ inputs.working-directory }}/package-lock.json
+# runs:
+#   using: "composite"
+#   steps:
+#     - name: Setup Node.js
+#       uses: actions/setup-node@v4
+#       with:
+#         node-version: ${{ inputs.node-version }}
+#         # Caching logic yahan built-in hai
+#         cache: 'npm'
+#         cache-dependency-path: ${{ inputs.working-directory }}/package-lock.json
 
-    - name: Install Dependencies
-      shell: bash
-      working-directory: ${{ inputs.working-directory }}
-      run: npm ci
+#     - name: Install Dependencies
+#       shell: bash
+#       working-directory: ${{ inputs.working-directory }}
+#       run: npm ci
